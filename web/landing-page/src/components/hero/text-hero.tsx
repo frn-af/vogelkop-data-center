@@ -412,10 +412,14 @@ export function TextHero() {
     });
 
     return (
-        <article ref={containerRef} className="h-[300vh] -mt-[50vh] relative">
+        <article
+            id="hero-section"
+            ref={containerRef}
+            className="h-[300vh] -mt-[50vh] relative"
+        >
             <div className="sticky top-0 h-screen p-4 pb-16 flex items-center overflow-hidden">
                 {/* Pixel Animation Background */}
-                <div className="absolute inset-0 opacity-20">
+                <div className="absolute inset-0 opacity-40">
                     <PixelBackground />
                 </div>
 

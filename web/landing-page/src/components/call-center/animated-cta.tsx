@@ -3,6 +3,14 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { motion, useInView } from "motion/react";
 import { useRef, useState } from "react";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "../optics/card";
 import { BadgeAlertIcon } from "../ui/badge-alert";
 import { Button } from "../ui/button";
 import { CalendarCheck2Icon } from "../ui/calendar-check-2";
@@ -45,14 +53,14 @@ interface FeatureCardProps {
 }
 
 /**
- * Feature card component
+ * Feature card component using optics Card
  */
 function FeatureCard({ feature, index, isInView }: FeatureCardProps) {
     const Icon = feature.icon;
 
     return (
         <motion.div
-            className="relative p-6 border border-border w-full max-w-[280px] shrink-0"
+            className="w-full max-w-[280px] h-full shrink-0"
             initial={{ y: 30, opacity: 0 }}
             animate={isInView ? { y: 0, opacity: 1 } : { y: 30, opacity: 0 }}
             transition={{
@@ -61,73 +69,38 @@ function FeatureCard({ feature, index, isInView }: FeatureCardProps) {
                 ease: ANIMATION.easing,
             }}
         >
-            {/* Card Corner Decorations */}
-            <div className="absolute -left-px -top-px z-10">
-                <div className="relative">
-                    <div className="bg-muted-foreground w-px h-[5px] rounded-full absolute top-0" />
-                    <div className="bg-muted-foreground w-[5px] h-px rounded-full absolute left-0" />
-                </div>
-            </div>
-            <div className="absolute right-0 -top-px z-10">
-                <div className="relative">
-                    <div className="bg-muted-foreground w-px h-[5px] rounded-full absolute top-0" />
-                    <div className="bg-muted-foreground w-[5px] h-px rounded-full absolute -left-[4.5px]" />
-                </div>
-            </div>
-            <div className="absolute -left-px bottom-0 z-10">
-                <div className="relative">
-                    <div className="bg-muted-foreground w-px h-[5px] rounded-full absolute -top-[4.5px]" />
-                    <div className="bg-muted-foreground w-[5px] h-px rounded-full absolute left-0" />
-                </div>
-            </div>
-            <div className="absolute right-0 bottom-0 z-10">
-                <div className="relative">
-                    <div className="bg-muted-foreground w-px h-[5px] rounded-full absolute -top-[4.5px]" />
-                    <div className="bg-muted-foreground w-[5px] h-px rounded-full absolute -left-[4.5px]" />
-                </div>
-            </div>
-
-            {/* Icon with Corner Decorations */}
-            <div className="mb-16">
-                <div className="relative w-14 h-14 border border-border flex items-center justify-center">
-                    {/* Icon Corner Decorations */}
-                    <div className="absolute -left-px -top-px z-10">
-                        <div className="relative">
-                            <div className="bg-muted-foreground w-px h-[4px] rounded-full absolute top-0" />
-                            <div className="bg-muted-foreground w-[4px] h-px rounded-full absolute left-0" />
-                        </div>
-                    </div>
-                    <div className="absolute right-0 -top-px z-10">
-                        <div className="relative">
-                            <div className="bg-muted-foreground w-px h-[4px] rounded-full absolute top-0" />
-                            <div className="bg-muted-foreground w-[4px] h-px rounded-full absolute -left-[3.5px]" />
-                        </div>
-                    </div>
-                    <div className="absolute -left-px bottom-0 z-10">
-                        <div className="relative">
-                            <div className="bg-muted-foreground w-px h-[4px] rounded-full absolute -top-[3.5px]" />
-                            <div className="bg-muted-foreground w-[4px] h-px rounded-full absolute left-0" />
-                        </div>
-                    </div>
-                    <div className="absolute right-0 bottom-0 z-10">
-                        <div className="relative">
-                            <div className="bg-muted-foreground w-px h-[4px] rounded-full absolute -top-[3.5px]" />
-                            <div className="bg-muted-foreground w-[4px] h-px rounded-full absolute -left-[3.5px]" />
-                        </div>
-                    </div>
-                    <Icon className="w-7 h-7" />
-                </div>
-            </div>
-            <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-                {feature.description}
-            </p>
-            <Button
-                variant="decorations"
-                className="mt-4 px-4 py-2 bg-primary hover:bg-primary-foreground text-background hover:text-foreground"
+            <Card
+                decorations
+                className="border border-border bg-transparent ring-0 h-full"
             >
-                {feature.button}
-            </Button>
+                <CardHeader className="h-3/5">
+                    {/* Icon with Corner Decorations */}
+                    <div className="mb-12">
+                        <Card
+                            decorations
+                            className="w-14 h-14 border border-border bg-transparent ring-0 flex items-center justify-center"
+                        >
+                            <Icon className="w-7 h-7" />
+                        </Card>
+                    </div>
+                    <CardTitle className="text-lg font-semibold">
+                        {feature.title}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="h-1/5">
+                    <CardDescription className="text-muted-foreground text-sm leading-relaxed">
+                        {feature.description}
+                    </CardDescription>
+                </CardContent>
+                <CardFooter background className="justify-end h-1/5">
+                    <Button
+                        variant="decorations"
+                        className="px-4 py-2 bg-primary hover:bg-primary-foreground text-background hover:text-foreground"
+                    >
+                        {feature.button}
+                    </Button>
+                </CardFooter>
+            </Card>
         </motion.div>
     );
 }

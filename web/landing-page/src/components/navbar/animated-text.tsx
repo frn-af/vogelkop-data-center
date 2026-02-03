@@ -3,6 +3,7 @@
 import { useLoaderComplete } from "@/hooks/use-loader-complete";
 import { motion } from "motion/react";
 import type { ElementType } from "react";
+import { NavItemButton } from "./nav-item-button";
 
 interface AnimatedTextProps {
     text: string;
@@ -61,7 +62,7 @@ interface AnimatedListItemProps {
 
 /**
  * Animated list item component for navigation menus.
- * Wraps text in an AnimatedText component with calculated delay.
+ * Wraps text in NavItemButton for ghost styling with animated underline.
  */
 export function AnimatedListItem({
     text,
@@ -70,7 +71,9 @@ export function AnimatedListItem({
 }: AnimatedListItemProps) {
     return (
         <li>
-            <AnimatedText text={text} delay={baseDelay + index * 0.08} />
+            <NavItemButton>
+                <AnimatedText text={text} delay={baseDelay + index * 0.08} />
+            </NavItemButton>
         </li>
     );
 }

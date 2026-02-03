@@ -7,8 +7,14 @@ import { AnimatedListItem, AnimatedText } from './animated-text';
 import NavSection from './nav-section.astro';
 ---
 
-<nav class="w-full p-4 font-sans fixed top-0 z-999" aria-label="Main Navigation">
+<nav 
+  id="main-navbar"
+  class="w-full p-4 font-sans fixed top-0 z-999 transition-all duration-300 ease-out translate-y-0" 
+  aria-label="Main Navigation"
+  data-collapsed="false"
+>
   <div class="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-6 gap-4">
+
     
     <!-- logo Column -->
     <NavSection title="Intro">
@@ -144,4 +150,83 @@ import NavSection from './nav-section.astro';
   nav::-webkit-scrollbar {
     display: none;
   }
+
+  /* Background when collapsed */
+  nav[data-collapsed="true"] {
+    background-color: hsl(var(--background) / 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  /* Collapsed state - hide nav content, show only titles */
+  nav[data-collapsed="true"] :global(.nav-content) {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+    overflow: hidden;
+  }
+
+  /* Expand on hover when collapsed */
+  nav[data-collapsed="true"]:hover :global(.nav-content) {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 0.75rem;
+  }
+
+  nav :global(.nav-content) {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 0.75rem;
+    transition: max-height 0.3s ease-out, opacity 0.2s ease-out, margin-top 0.3s ease-out;
+  }
 </style>
+
+<script>
+  // Navbar scroll behavior controller
+  // Shows expanded navbar on page load, collapses when scrolling down
+  
+  function initNavbarScrollBehavior() {
+    const navbar = document.getElementById('main-navbar');
+    
+    if (!navbar) return;
+    
+    // Collapse after scrolling 150vh (1.5x viewport height)
+    const COLLAPSE_THRESHOLD = window.innerHeight * 1.5;
+    
+    function updateNavbarState() {
+      if (!navbar) return;
+      
+      const scrollY = window.scrollY || window.pageYOffset;
+      const shouldCollapse = scrollY > COLLAPSE_THRESHOLD;
+      
+      if (shouldCollapse) {
+        navbar.setAttribute('data-collapsed', 'true');
+      } else {
+        navbar.setAttribute('data-collapsed', 'false');
+      }
+    }
+    
+    // Throttled scroll handler
+    let ticking = false;
+    function onScroll() {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updateNavbarState();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+    
+    window.addEventListener('scroll', onScroll, { passive: true });
+    updateNavbarState(); // Initial check
+  }
+  
+  // Initialize after DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNavbarScrollBehavior);
+  } else {
+    initNavbarScrollBehavior();
+  }
+</script>
