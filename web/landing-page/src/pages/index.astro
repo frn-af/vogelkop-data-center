@@ -1,18 +1,30 @@
 ---
-import CallCenter from '@/components/call-center/call-center.astro';
-import Footer from '@/components/footer/footer.astro';
-import Hero from '@/components/hero/hero.astro';
-import Statistics from '@/components/statistics/statistics.astro';
-import Layout from '../layouts/Layout.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import { Background } from '@/components/background';
+import { FAQ } from '@/components/blocks/faq';
+import { Features } from '@/components/blocks/features';
+import { Hero } from '@/components/blocks/hero';
+import { Logos } from '@/components/blocks/logos';
+import { Pricing } from '@/components/blocks/pricing';
+import { ResourceAllocation } from '@/components/blocks/resource-allocation';
+import { Testimonials } from '@/components/blocks/testimonials';
+import DefaultLayout from '@/layouts/DefaultLayout.astro';
+
+
+
 ---
 
-<Layout>
-	<Hero />
-	<CallCenter />
-	<Statistics />
-	<Footer />
-</Layout>
-
+<DefaultLayout title={SITE_TITLE} description={SITE_DESCRIPTION} >
+  <Background className="via-muted to-muted/80">
+    <Hero />
+    <Logos client:only="react"/> 
+    <Features />
+    <ResourceAllocation />
+  </Background>
+  <Testimonials client:only='react'/>
+  <Background variant="bottom">
+    <Pricing client:only='react'/>
+    <FAQ client:only='react'/>
+  </Background>
+</DefaultLayout>

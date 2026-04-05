@@ -1,46 +1,76 @@
-# Astro Starter Kit: Basics
+# Mainline Astro Template
 
-```sh
-bun create astro@latest -- --template basics
+Mainline is a free template built with shadcn/ui, Tailwind 4 and Astro 5.
+
+- [Demo](https://mainline-astro-template.vercel.app/)
+- [Documentation](https://docs.shadcnblocks.com/templates/getting-started)
+- [Figma](https://www.figma.com/design/cFCLMj7DFv0sK7EVsqKeTa/Mainline?node-id=23250-13201&t=I1nAdchDpknii5Bd-1)
+
+![Mainline Astro Template screenshot](./public/og-image.jpg)
+
+## Getting Started
+
+```bash
+npm install
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+```bash
+npm run dev
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## 🧞 Commands
+## Features
 
-All commands are run from the root of the project, from a terminal:
+### Core Technology Stack
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `bun install`             | Installs dependencies                            |
-| `bun dev`             | Starts local dev server at `localhost:4321`      |
-| `bun build`           | Build your production site to `./dist/`          |
-| `bun preview`         | Preview your build locally, before deploying     |
-| `bun astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `bun astro -- --help` | Get help using the Astro CLI                     |
+- **Astro 5** built with Astro
+- **Tailwind CSS 4** for styling
+- **shadcn/ui** components
+- **TypeScript** support
+- **React 19**
 
-## 👀 Want to learn more?
+### Key Features
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- **Shadcn UI**: uses [shadcn/ui](https://ui.shadcn.com/) core UI components
+- **Theme System**: Dark/light mode with `astro-themes`, compatible with [tweakcn](https://tweakcn.com)
+- **MDX Support**: For content pages
+- **Animations**: Motion library (Framer Motion) integration
+- **Prettier**: Pre-configured code formatting
+- **Custom Fonts**: DM Sans font family included
+- **Icons**: Lucide React + React Icons libraries
+- **Styleglide Integration**: For component previews/development
+- **Responsive Design**: Mobile-friendly layout
+- **SEO Ready**: Proper metadata and OG images included
+
+### Pre-built Pages
+
+- Home/Landing page
+- About page
+- Pricing page
+- FAQ page
+- Contact page with form
+- Login/Signup pages
+
+### Blocks
+
+- Hero section
+- Logo showcase/marquee
+- Features section
+- Resource allocation section
+- Testimonials with carousel
+- Pricing table
+- FAQ with accordion
+- Footer
+- Navigation bar
+
+## Deployment
+
+Production-ready and tested for deployment on [Vercel](https://vercel.com)
+
+## Credits
+
+- Template by [shadcnblocks.com](https://shadcnblocks.com)
+- Design by [Callum Flack](https://x.com/callumflack)
+- Dev by [Yassine Zaanouni](https://x.com/YassineZaanouni)
+- Produced by [Rob Austin](https://x.com/ausrobdev)

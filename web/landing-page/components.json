@@ -10,7 +10,6 @@
     "cssVariables": true,
     "prefix": ""
   },
-  "iconLibrary": "lucide",
   "aliases": {
     "components": "@/components",
     "utils": "@/lib/utils",
@@ -18,8 +17,5 @@
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
-  "registries": {
-    "@optics": "https://optics.agusmayol.com.ar/r/{name}.json",
-    "@lucide-animated": "https://lucide-animated.com/r/{name}.json"
-  }
+  "iconLibrary": "lucide"
 }
