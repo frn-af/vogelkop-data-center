@@ -49,7 +49,7 @@ This project aims to provide a robust infrastructure for handling diverse datase
 
 ```
 vogelkop-data-center/
-├── 📁 api/                    # Backend API source code
+├── 📁 api/                    # OpenAPI/Swagger specs and JSON schemas
 ├── 📁 data/                   # Sample datasets and schemas
 ├── 📁 docs/                   # Documentation and architectural diagrams
 ├── 📁 scripts/                # ETL and maintenance scripts
@@ -98,7 +98,7 @@ docker-compose up --build
 | Service      | URL                                                      |
 | ------------ | -------------------------------------------------------- |
 | 🖥️ Dashboard | [http://localhost:3000](http://localhost:3000)           |
-| 📚 API Docs  | [http://localhost:8000/docs](http://localhost:8000/docs) |
+| 📚 API Docs  | [http://localhost:8000/swagger/index.html](http://localhost:8000/swagger/index.html) |
 
 ## 🤝 Contributing
 

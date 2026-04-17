@@ -1,0 +1,870 @@
+basePath: /api/v1
+definitions:
+  models.ConservationArea:
+    properties:
+      area_description:
+        type: string
+      area_name:
+        type: string
+      area_note:
+        type: string
+      area_register:
+        type: integer
+      created_at:
+        type: string
+      created_by:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
+  models.ConservationAreaRequest:
+    properties:
+      area_description:
+        type: string
+      area_name:
+        type: string
+      area_note:
+        type: string
+      area_register:
+        type: integer
+    required:
+    - area_register
+    type: object
+  models.Function:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      function_description:
+        type: string
+      function_name:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
+  models.FunctionRequest:
+    properties:
+      function_description:
+        type: string
+      function_name:
+        type: string
+    type: object
+  models.LegalDecision:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      decision_date:
+        type: string
+      decision_description:
+        type: string
+      decision_name:
+        type: string
+      decision_number:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
+  models.LegalDecisionRequest:
+    properties:
+      decision_date:
+        type: string
+      decision_description:
+        type: string
+      decision_name:
+        type: string
+      decision_number:
+        type: string
+    type: object
+  models.Location:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      province_name:
+        type: string
+      regency_name:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
+  models.LocationRequest:
+    properties:
+      province_name:
+        type: string
+      regency_name:
+        type: string
+    type: object
+  models.PaginatedResponse:
+    properties:
+      data: {}
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  models.ZoningBlock:
+    properties:
+      area_id:
+        type: string
+      block_description:
+        type: string
+      block_type:
+        type: string
+      created_at:
+        type: string
+      created_by:
+        type: string
+      id:
+        type: string
+      is_active:
+        type: boolean
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
+  models.ZoningBlockRequest:
+    properties:
+      area_id:
+        type: string
+      block_description:
+        type: string
+      block_type:
+        type: string
+    required:
+    - area_id
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@vogelkop.org
+    name: API Support
+  description: API Server for Vogelkop Data Center management
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Vogelkop Data Center API
+  version: "1.0"
+paths:
+  /auth/google/callback:
+    get:
+      description: Handles OAuth callback and returns JWT token
+      parameters:
+      - description: OAuth Code
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: OAuth State
+        in: query
+        name: state
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Google OAuth Callback
+      tags:
+      - Auth
+  /auth/google/login:
+    get:
+      description: Initiates Google OAuth flow
+      responses:
+        "302":
+          description: Found
+      summary: Redirects to Google OAuth
+      tags:
+      - Auth
+  /conservation-areas:
+    get:
+      description: Get paginated list of conservation areas
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PaginatedResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List conservation areas
+      tags:
+      - Conservation Areas
+    post:
+      consumes:
+      - application/json
+      description: Create a new conservation area
+      parameters:
+      - description: Conservation Area data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConservationAreaRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ConservationArea'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create a conservation area
+      tags:
+      - Conservation Areas
+  /conservation-areas/{id}:
+    delete:
+      description: Soft-delete a conservation area
+      parameters:
+      - description: Conservation Area ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a conservation area
+      tags:
+      - Conservation Areas
+    get:
+      description: Get a single conservation area by ID
+      parameters:
+      - description: Conservation Area ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ConservationArea'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a conservation area
+      tags:
+      - Conservation Areas
+    put:
+      consumes:
+      - application/json
+      description: Update an existing conservation area
+      parameters:
+      - description: Conservation Area ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Conservation Area data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.ConservationAreaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ConservationArea'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update a conservation area
+      tags:
+      - Conservation Areas
+  /functions:
+    get:
+      description: Get paginated list of functions
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PaginatedResponse'
+      security:
+      - BearerAuth: []
+      summary: List functions
+      tags:
+      - Functions
+    post:
+      consumes:
+      - application/json
+      description: Create a new function
+      parameters:
+      - description: Function data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.FunctionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Function'
+      security:
+      - BearerAuth: []
+      summary: Create a function
+      tags:
+      - Functions
+  /functions/{id}:
+    delete:
+      description: Soft-delete a function
+      parameters:
+      - description: Function ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a function
+      tags:
+      - Functions
+    get:
+      description: Get a single function by ID
+      parameters:
+      - description: Function ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Function'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a function
+      tags:
+      - Functions
+    put:
+      consumes:
+      - application/json
+      description: Update an existing function
+      parameters:
+      - description: Function ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Function data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.FunctionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Function'
+      security:
+      - BearerAuth: []
+      summary: Update a function
+      tags:
+      - Functions
+  /health:
+    get:
+      description: Check if the API is running
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health Check
+      tags:
+      - System
+  /legal-decisions:
+    get:
+      description: Get paginated list of legal decisions
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PaginatedResponse'
+      security:
+      - BearerAuth: []
+      summary: List legal decisions
+      tags:
+      - Legal Decisions
+    post:
+      consumes:
+      - application/json
+      description: Create a new legal decision
+      parameters:
+      - description: Legal Decision data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.LegalDecisionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.LegalDecision'
+      security:
+      - BearerAuth: []
+      summary: Create a legal decision
+      tags:
+      - Legal Decisions
+  /legal-decisions/{id}:
+    delete:
+      description: Soft-delete a legal decision
+      parameters:
+      - description: Legal Decision ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a legal decision
+      tags:
+      - Legal Decisions
+    get:
+      description: Get a single legal decision by ID
+      parameters:
+      - description: Legal Decision ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LegalDecision'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a legal decision
+      tags:
+      - Legal Decisions
+    put:
+      consumes:
+      - application/json
+      description: Update an existing legal decision
+      parameters:
+      - description: Legal Decision ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Legal Decision data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.LegalDecisionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LegalDecision'
+      security:
+      - BearerAuth: []
+      summary: Update a legal decision
+      tags:
+      - Legal Decisions
+  /locations:
+    get:
+      description: Get paginated list of locations
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PaginatedResponse'
+      security:
+      - BearerAuth: []
+      summary: List locations
+      tags:
+      - Locations
+    post:
+      consumes:
+      - application/json
+      description: Create a new location
+      parameters:
+      - description: Location data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.LocationRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Location'
+      security:
+      - BearerAuth: []
+      summary: Create a location
+      tags:
+      - Locations
+  /locations/{id}:
+    delete:
+      description: Soft-delete a location
+      parameters:
+      - description: Location ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a location
+      tags:
+      - Locations
+    get:
+      description: Get a single location by ID
+      parameters:
+      - description: Location ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Location'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a location
+      tags:
+      - Locations
+    put:
+      consumes:
+      - application/json
+      description: Update an existing location
+      parameters:
+      - description: Location ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Location data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.LocationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Location'
+      security:
+      - BearerAuth: []
+      summary: Update a location
+      tags:
+      - Locations
+  /zoning-blocks:
+    get:
+      description: Get paginated list of zoning blocks
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Items per page
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PaginatedResponse'
+      security:
+      - BearerAuth: []
+      summary: List zoning blocks
+      tags:
+      - Zoning Blocks
+    post:
+      consumes:
+      - application/json
+      description: Create a new zoning block
+      parameters:
+      - description: Zoning Block data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.ZoningBlockRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.ZoningBlock'
+      security:
+      - BearerAuth: []
+      summary: Create a zoning block
+      tags:
+      - Zoning Blocks
+  /zoning-blocks/{id}:
+    delete:
+      description: Soft-delete a zoning block
+      parameters:
+      - description: Zoning Block ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete a zoning block
+      tags:
+      - Zoning Blocks
+    get:
+      description: Get a single zoning block by ID
+      parameters:
+      - description: Zoning Block ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ZoningBlock'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get a zoning block
+      tags:
+      - Zoning Blocks
+    put:
+      consumes:
+      - application/json
+      description: Update an existing zoning block
+      parameters:
+      - description: Zoning Block ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Zoning Block data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.ZoningBlockRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ZoningBlock'
+      security:
+      - BearerAuth: []
+      summary: Update a zoning block
+      tags:
+      - Zoning Blocks
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

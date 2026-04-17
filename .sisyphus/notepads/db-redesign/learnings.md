@@ -22,3 +22,9 @@
   - Data migration from legacy `vogelkop_*` tables is handled via `DO $$ BEGIN ... END $$;` blocks in the `.up.sql` files to ensure idempotency and safety.
   - Cross-schema FK constraints are explicitly defined in the DDL.
   - Rollback strategy is implemented in `.down.sql` files using `DROP SCHEMA IF EXISTS ... CASCADE;` to cleanly remove the new schemas and tables.
+
+### Swagger File Relocation
+- Moved `docs/swagger.yaml` and `docs/swagger.json` to `api/`.
+- Moved `docs/docs.go` to `api/docs/docs.go` to keep Go-based swagger spec with the static files.
+- Updated `cmd/api/main.go` import from `github.com/BBKSDAPBD/vogelkop-data-center/docs` to `github.com/BBKSDAPBD/vogelkop-data-center/api/docs`.
+- Updated `README.md` to reflect the new location of API documentation and corrected the URL to `/swagger/index.html`.

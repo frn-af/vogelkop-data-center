@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	_ "github.com/BBKSDAPBD/vogelkop-data-center/docs" // Swagger docs generated
+	_ "github.com/BBKSDAPBD/vogelkop-data-center/api/docs" // Swagger docs generated
 	"github.com/BBKSDAPBD/vogelkop-data-center/internal/api"
 	"github.com/BBKSDAPBD/vogelkop-data-center/internal/config"
 	"github.com/BBKSDAPBD/vogelkop-data-center/internal/db"
@@ -49,7 +49,7 @@ func main() {
 	}
 
 	// Setup Gin router
-	router := api.SetupRouter(cfg)
+	router := api.SetupRouter(cfg, db.PostgresPool)
 
 	// Start server
 	log.Printf("Starting server on port %s...", cfg.AppPort)
