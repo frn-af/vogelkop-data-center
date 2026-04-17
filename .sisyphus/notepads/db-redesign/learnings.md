@@ -14,3 +14,11 @@
 
 ## [2026-04-17T03:20:00Z] Task: Progress tracking
 - Summary: Drafted per-schema documentation skeleton with plan to fill in concrete DDL and constraints. Next steps: populate detailed fields and constraints in docs/database-design.md, and prepare migration plan.
+
+## [2026-04-17T03:30:00Z] Task: Concrete Migrations
+- Summary: Implemented concrete SQL migration files for auth, core, and cms schemas. Added data mapping table to docs/database-design.md.
+- Key learnings:
+  - Migration files are split into up/down scripts for each schema.
+  - Data migration from legacy `vogelkop_*` tables is handled via `DO $$ BEGIN ... END $$;` blocks in the `.up.sql` files to ensure idempotency and safety.
+  - Cross-schema FK constraints are explicitly defined in the DDL.
+  - Rollback strategy is implemented in `.down.sql` files using `DROP SCHEMA IF EXISTS ... CASCADE;` to cleanly remove the new schemas and tables.

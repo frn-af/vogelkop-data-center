@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS core.zoning_blocks CASCADE;
+DROP TABLE IF EXISTS core.functions CASCADE;
+DROP TABLE IF EXISTS core.locations CASCADE;
+DROP TABLE IF EXISTS core.legal_decisions CASCADE;
+DROP TABLE IF EXISTS core.conservation_areas CASCADE;
+DROP SCHEMA IF EXISTS core CASCADE;

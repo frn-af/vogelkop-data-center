@@ -220,12 +220,245 @@ This draft provides the scaffolding for a formal per-schema documentation in doc
 ```sql
 -- Example: create per-schema basics (not final definitions)
 CREATE SCHEMA IF NOT EXISTS auth;
-CREATE TABLE auth.users (...);
+CREATE TABLE auth.users (
+  user_id UUID PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  name TEXT,
+  password_hash TEXT NOT NULL,
+  avatar TEXT,
+  verified_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
+CREATE TABLE auth.accounts (
+  account_id UUID PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(user_id),
+  provider TEXT,
+  provider_id TEXT,
+  refresh_token TEXT,
+  access_token TEXT,
+  expires_at TIMESTAMPTZ,
+  token_type TEXT,
+  account_scope TEXT,
+  id_token TEXT,
+  session_state TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
+CREATE TABLE auth.roles (
+  role_id UUID PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT,
+  permissions JSONB,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
+CREATE TABLE auth.sessions (
+  session_id UUID PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(user_id),
+  expires TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
+CREATE TABLE auth.verification_tokens (
+  identifier TEXT PRIMARY KEY,
+  token TEXT NOT NULL,
+  expires TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
+CREATE TABLE auth.activity_logs (
+  log_id UUID PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(user_id),
+  log_action_type TEXT,
+  entity_table TEXT,
+  entity_ID UUID,
+  changes JSONB,
+  ip_address TEXT,
+  user_agent TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
 CREATE SCHEMA IF NOT EXISTS core;
-CREATE TABLE core.conservation_areas (...);
-CREATE SCHEMA IF NOT EXISTS cms;
-CREATE TABLE cms.posts (...);
+CREATE TABLE core.conservation_areas (
+  area_id UUID PRIMARY KEY,
+  area_register INT NOT NULL,
+  area_name TEXT,
+  area_description TEXT,
+  area_note TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
+CREATE TABLE core.legal_decisions (
+  decision_id UUID PRIMARY KEY,
+  decision_name TEXT,
+  decision_date DATE,
+  decision_number TEXT,
+  decision_description TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
+CREATE TABLE core.locations (
+  location_id UUID PRIMARY KEY,
+  regency_name TEXT,
+  province_name TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
+CREATE TABLE core.functions (
+  function_id UUID PRIMARY KEY,
+  function_name TEXT,
+  function_description TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
+CREATE TABLE core.zoning_blocks (
+  block_id UUID PRIMARY KEY,
+  area_id UUID REFERENCES core.conservation_areas(area_id),
+  block_type TEXT,
+  block_description TEXT
+);
+
+CREATE TABLE cms.posts (
+  post_id UUID PRIMARY KEY,
+  author_id UUID REFERENCES auth.users(user_id),
+  title TEXT,
+  slug TEXT UNIQUE,
+  content TEXT,
+  excerpt TEXT,
+  published_at TIMESTAMPTZ,
+  status TEXT,
+  featured_image TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
+CREATE TABLE cms.categories (
+  category_id UUID PRIMARY KEY,
+  name TEXT,
+  slug TEXT UNIQUE,
+  description TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
+CREATE TABLE cms.tags (
+  tag_id UUID PRIMARY KEY,
+  name TEXT,
+  slug TEXT UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+
+CREATE TABLE cms.post_categories (
+  post_id UUID REFERENCES cms.posts(post_id),
+  category_id UUID REFERENCES cms.categories(category_id),
+  PRIMARY KEY (post_id, category_id)
+);
+
+CREATE TABLE cms.post_tags (
+  post_id UUID REFERENCES cms.posts(post_id),
+  tag_id UUID REFERENCES cms.tags(tag_id),
+  PRIMARY KEY (post_id, tag_id)
+);
+
+CREATE TABLE cms.media (
+  media_id UUID PRIMARY KEY,
+  file_name TEXT,
+  file_path TEXT,
+  file_type TEXT,
+  file_size INT,
+  metadata JSONB,
+  uploaded_by UUID REFERENCES auth.users(user_id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
 ```
+
+Migration outline (high level)
+- Create schemas auth/core/cms if not exists; create core and cms tables within their namespaces; postpone data migration for existing vogelkop_* tables until you’re ready to cut over.
+- For each Vogelkop table, move to the new namespace with ALTER TABLE old_schema.table SET SCHEMA new_schema; then create new foreign keys and update references as needed; run data validation checks after each move.
+- Implement a small seed/migration script (Go or SQL) to populate the minimal baseline data for the new schemas and to validate constraints.
 
 #### Schema: Auth
 - Tables:
@@ -814,3 +1047,38 @@ For questions about this database design:
 _Balai Besar KSDA Papua Barat Daya_
 
 </div>
+
+### Data Mapping Table (Legacy to Per-Schema)
+
+| Legacy Table (`public.vogelkop_*`) | New Schema & Table (`schema.table`) | Column Changes / Notes |
+| :--- | :--- | :--- |
+| `vogelkop_users` | `auth.users` | `user_email` -> `email`, `user_name` -> `name`, `user_password` -> `password_hash`, `user_avatar` -> `avatar`, `user_verified` -> `verified_at` |
+| `vogelkop_account` | `auth.accounts` | `account_provider` -> `provider`, `account_provider_ID` -> `provider_id`, `account_scope` -> `account_scope` |
+| `vogelkop_role` | `auth.roles` | `role_name` -> `name`, `role_description` -> `description`, `role_permission` -> `permissions` |
+| `vogelkop_session` | `auth.sessions` | No major column renames |
+| `vogelkop_verification_token` | `auth.verification_tokens` | No major column renames |
+| `vogelkop_activity_logs` | `auth.activity_logs` | Moved from core to auth schema |
+| `vogelkop_conservation_areas` | `core.conservation_areas` | No major column renames |
+| `vogelkop_legal_decisions` | `core.legal_decisions` | No major column renames |
+| `vogelkop_locations` | `core.locations` | No major column renames |
+| `vogelkop_functions` | `core.functions` | No major column renames |
+| `vogelkop_zoning_blocks` | `core.zoning_blocks` | No major column renames |
+| `vogelkop_area_plannings` | `core.area_plannings` | No major column renames |
+| `vogelkop_documents` | `core.documents` | No major column renames |
+| `vogelkop_ecosistem_recoveries` | `core.ecosistem_recoveries` | No major column renames |
+| `vogelkop_assessments` | `core.assessments` | No major column renames |
+| `vogelkop_certificates_in_area` | `core.certificates_in_area` | No major column renames |
+| `vogelkop_build_up_areas` | `core.build_up_areas` | No major column renames |
+| `vogelkop_area_decision` | `core.area_decisions` | No major column renames |
+| `vogelkop_area_locations` | `core.area_locations` | No major column renames |
+| `vogelkop_area_functions` | `core.area_functions` | No major column renames |
+| `vogelkop_planning_documents` | `core.planning_documents` | No major column renames |
+| `vogelkop_recovery_locations` | `core.recovery_locations` | No major column renames |
+| `vogelkop_recovery_blocks` | `core.recovery_blocks` | No major column renames |
+| `vogelkop_buildup_locations` | `core.buildup_locations` | No major column renames |
+| *(New)* | `cms.posts` | New table for CMS |
+| *(New)* | `cms.categories` | New table for CMS |
+| *(New)* | `cms.tags` | New table for CMS |
+| *(New)* | `cms.post_categories` | New table for CMS |
+| *(New)* | `cms.post_tags` | New table for CMS |
+| *(New)* | `cms.media` | New table for CMS |
