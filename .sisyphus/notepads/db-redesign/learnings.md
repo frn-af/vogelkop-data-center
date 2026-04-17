@@ -14,4 +14,3 @@
 
 ## [2026-04-17T03:20:00Z] Task: Progress tracking
 - Summary: Drafted per-schema documentation skeleton with plan to fill in concrete DDL and constraints. Next steps: populate detailed fields and constraints in docs/database-design.md, and prepare migration plan.
-- Summary: Drafted per-schema documentation skeleton with plan to fill in concrete DDL and constraints. Next steps: populate detailed fields and constraints in docs/database-design.md, and prepare migration plan.

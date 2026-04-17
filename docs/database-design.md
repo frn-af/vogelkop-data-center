@@ -214,7 +214,18 @@ This draft provides the scaffolding for a formal per-schema documentation in doc
 
 ### Schema Implementations (Auth, Core, CMS)
 
-This section outlines the intended per-schema design at a high level to guide concrete definitions in follow-up work.
+ This section outlines the intended per-schema design at a high level to guide concrete definitions in follow-up work.
+
+### Example DDL skeletons (not final)
+```sql
+-- Example: create per-schema basics (not final definitions)
+CREATE SCHEMA IF NOT EXISTS auth;
+CREATE TABLE auth.users (...);
+CREATE SCHEMA IF NOT EXISTS core;
+CREATE TABLE core.conservation_areas (...);
+CREATE SCHEMA IF NOT EXISTS cms;
+CREATE TABLE cms.posts (...);
+```
 
 #### Schema: Auth
 - Tables:
@@ -314,6 +325,17 @@ CREATE TABLE cms.posts (
 ```
 
 These are skeletons intended to guide the actual, fully-typed DDL we’ll introduce in the migration plan. The final implementation will refine data types and constraints to align with the domain model and performance requirements.
+
+---
+
+### Cross-schema FK Examples
+
+```sql
+-- Example cross-schema FK constraints
+ALTER TABLE cms.posts ADD CONSTRAINT fk_posts_author FOREIGN KEY (author_id) REFERENCES auth.users(user_id);
+ALTER TABLE cms.media ADD CONSTRAINT fk_media_uploaded_by FOREIGN KEY (uploaded_by) REFERENCES auth.users(user_id);
+ALTER TABLE core.area_decisions ADD CONSTRAINT fk_area_decisions_area_id FOREIGN KEY (area_id) REFERENCES core.conservation_areas(area_id);
+```
 
 ---
 ### `vogelkop_conservation_areas` _(Master Table)_
