@@ -156,6 +156,166 @@ Every table must include these standard metadata columns:
 
 ## 🏛️ Core Tables
 
+### Schema: Auth (Auth-related tables)
+- auth.users (PK: user_id UUID, unique email, name, password_hash, avatar, verified_at, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- auth.accounts (PK: account_id UUID, user_id UUID FK -> auth.users(user_id), provider, provider_id, refresh_token, access_token, expires_at, token_type, scope, id_token, session_state, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- auth.roles (PK: role_id UUID, name, description, permissions JSONB, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- auth.sessions (PK: session_id UUID, user_id UUID FK -> auth.users(user_id), expires, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- auth.verification_tokens (PK: identifier, token, expires, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- auth.activity_logs (PK: log_id UUID, user_id UUID FK -> auth.users(user_id), log_action_type ENUM, entity_table TEXT, entity_ID UUID, changes JSONB, ip_address TEXT, user_agent TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+
+### Schema: Core (Conservation & Domain data)
+- core.conservation_areas (area_id UUID PK, area_register INT, area_name TEXT, area_description TEXT, area_note TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.legal_decisions (decision_id UUID PK, decision_name TEXT, decision_date DATE, decision_number TEXT, decision_description TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.locations (location_id UUID PK, regency_name TEXT, province_name TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.functions (function_id UUID PK, function_name TEXT, function_description TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.zoning_blocks (block_id UUID PK, area_id UUID FK -> core.conservation_areas, block_type ENUM, block_description TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.area_plannings (plan_id UUID PK, area_id UUID FK -> core.conservation_areas, plan_start DATE, plan_end DATE, plan_status ENUM, plan_approval_date DATE, plan_description TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.documents (document_id UUID PK, area_id UUID FK -> core.conservation_areas, document_name TEXT, document_number TEXT, document_type ENUM, document_path TEXT, document_cover TEXT, document_description TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.ecosistem_recoveries (recovery_id UUID PK, area_id UUID FK -> core.conservation_areas, recovery_site INT, recovery_area FLOAT, recovery_damage_level ENUM, cause_of_damage ENUM, recovery_action ENUM, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.assessments (assessment_id UUID PK, area_id UUID FK -> core.conservation_areas, assessment_year INT, assessment_score INT, assessment_category ENUM, assessment_description TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.certificates_in_area (certificate_id UUID PK, area_id UUID FK -> core.conservation_areas, certificate_right ENUM, certificate_NIB INT, certificate_area FLOAT, certificate_progress TEXT, certificate_description TEXT, location_id UUID FK, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.build_up_areas (buildup_id UUID PK, area_id UUID FK -> core.conservation_areas, buildup_subject_type ENUM, buildup_area FLOAT, buildup_activities TEXT, buildup_year DATE, buildup_permit TEXT, buildup_layout TEXT, buildup_overlap TEXT, buildup_status ENUM, buildup_survey_year DATE, buildup_subject_name TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.area_decisions (area_decision_id UUID PK, area_id UUID FK -> core.conservation_areas, decision_id UUID FK -> core.legal_decisions, decision_area FLOAT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.area_locations (area_location_id UUID PK, area_id UUID FK -> core.conservation_areas, location_id UUID FK, area_location FLOAT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.area_functions (area_function_id UUID PK, area_id UUID FK -> core.conservation_areas, function_id UUID FK -> core.functions, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- core.activity_logs (log_id UUID PK, user_id UUID FK -> auth.users, log_action_type ENUM, entity_table TEXT, entity_ID UUID, changes JSONB, ip_address TEXT, user_agent TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+
+### Schema: CMS
+- cms.posts (post_id UUID PK, author_id UUID FK -> auth.users, title TEXT, slug TEXT UNIQUE, content TEXT, excerpt TEXT, published_at TIMESTAMPTZ, status ENUM (draft/published/archived), featured_image TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- cms.categories (category_id UUID PK, name TEXT, slug TEXT UNIQUE, description TEXT, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- cms.tags (tag_id UUID PK, name TEXT, slug TEXT UNIQUE, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- cms.post_categories (post_id UUID FK -> cms.posts, category_id UUID FK -> cms.categories, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- cms.post_tags (post_id UUID FK -> cms.posts, tag_id UUID FK -> cms.tags, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+- cms.media (media_id UUID PK, file_name TEXT, file_path TEXT, file_type TEXT, file_size INT, metadata JSONB, uploaded_by UUID FK -> auth.users, created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+
+### Shared Enumerations and Cross-Schema References
+- Enumerations (e.g., post_status, plan_status) are recommended to live in a shared area (public or shared schema) to avoid type-not-found in cross-schema queries. Consider declaring them under a dedicated public.shared_enums schema or within each schema as appropriate.
+
+### Indexing Guidance (High level)
+- cms.posts.slug: unique index
+- cms.* foreign keys: index on FK columns (post.author_id, post_categories.post_id, etc.)
+- auth.users.email: index for quick lookup
+- cms.media.metadata: GIN index for JSONB fields
+- core.* geometry columns (if added): GIST index
+
+### UUID Generation
+- Recommend UUIDv7 for primary keys for time-ordered indexing. Document that generation occurs in the application layer (Go) or via a small PL/pgSQL helper if you prefer server-side generation.
+
+### Cross-schema Integrity
+- Use explicit schema-qualified references (auth.users, cms.media) to ensure clarity in joins.
+
+### Data Migration Guidance
+- Plan to migrate existing vogelkop_* tables to their new schema-qualified names in a staged fashion, with data transformation steps documented in an accompanying migration plan.
+
+This draft provides the scaffolding for a formal per-schema documentation in docs/database-design.md. The next step is to populate each section with concrete field definitions, exact data types, constraints, and example SQL snippets to guide implementation.
+
+---
+
+### Schema Implementations (Auth, Core, CMS)
+
+This section outlines the intended per-schema design at a high level to guide concrete definitions in follow-up work.
+
+#### Schema: Auth
+- Tables:
+  - auth.users: user_id UUID PK, email TEXT UNIQUE, name TEXT, password_hash TEXT, avatar TEXT, verified_at TIMESTAMPTZ, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ, deleted_at TIMESTAMPTZ, is_active BOOLEAN, created_by UUID, updated_by UUID, deleted_by UUID
+  - auth.accounts: account_id UUID PK, user_id UUID FK -> auth.users(user_id), provider TEXT, provider_id TEXT, refresh_token TEXT, access_token TEXT, expires_at TIMESTAMPTZ, token_type TEXT, account_scope TEXT, id_token TEXT, session_state TEXT, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ, deleted_at TIMESTAMPTZ, is_active BOOLEAN, created_by UUID, updated_by UUID, deleted_by UUID
+  - auth.roles: role_id UUID PK, name TEXT, description TEXT, permissions JSONB, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ, deleted_at TIMESTAMPTZ, is_active BOOLEAN, created_by UUID, updated_by UUID, deleted_by UUID
+  - auth.sessions: session_id UUID PK, user_id UUID FK -> auth.users(user_id), expires TIMESTAMPTZ, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ, deleted_at TIMESTAMPTZ, is_active BOOLEAN, created_by UUID, updated_by UUID, deleted_by UUID
+  - auth.verification_tokens: identifier UUID PK, token TEXT, expires TIMESTAMPTZ, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ, deleted_at TIMESTAMPTZ, is_active BOOLEAN, created_by UUID, updated_by UUID, deleted_by UUID
+  - auth.activity_logs: log_id UUID PK, user_id UUID FK -> auth.users(user_id), log_action_type ENUM, entity_table TEXT, entity_ID UUID, changes JSONB, ip_address TEXT, user_agent TEXT, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ, deleted_at TIMESTAMPTZ, is_active BOOLEAN, created_by UUID, updated_by UUID, deleted_by UUID
+
+#### Schema: Core
+- Tables include master data, domain data, and junctions migrated to core.* namespace. Example tables (names indicative):
+  - core.conservation_areas, core.legal_decisions, core.locations, core.functions, core.zoning_blocks, core.area_plannings, core.documents, core.ecosistem_recoveries, core.assessments, core.certificates_in_area, core.build_up_areas
+  - Core junctions: core.area_decisions, core.area_locations, core.area_functions, core.activity_logs
+  - Common fields: area_id/location_id/document_id etc. UUID PKs, audit columns (created_at, updated_at, deleted_at, is_active, created_by, updated_by, deleted_by)
+
+#### Schema: CMS
+- Tables: cms.posts, cms.categories, cms.tags, cms.post_categories, cms.post_tags, cms.media
+- Fields overview (high level):
+  - cms.posts: post_id UUID PK, author_id FK -> auth.users(user_id), title, slug UNIQUE, content, excerpt, published_at TIMESTAMPTZ, status ENUM (draft/published/archived), featured_image, audit fields
+  - cms.categories: category_id UUID PK, name, slug UNIQUE, description, audit fields
+  - cms.tags: tag_id UUID PK, name, slug UNIQUE, audit fields
+  - cms.post_categories: post_id FK -> cms.posts, category_id FK -> cms.categories, audit fields
+  - cms.post_tags: post_id FK -> cms.posts, tag_id FK -> cms.tags, audit fields
+  - cms.media: media_id UUID PK, file_name, file_path, file_type, file_size, metadata JSONB, uploaded_by FK -> auth.users, audit fields
+
+Notes:
+- All cross-schema FKs should be schema-qualified, e.g., cms.posts.author_id REFERENCES auth.users(user_id).
+- UUID generation strategy: maintain consistent UUIDv7 usage across schemas.
+- Indexing guidance provided in the main plan remains applicable.
+
+---
+---
+
+### Schema Implementation Snippets (Markdown skeleton)
+
+- Auth schema (auth.*)
+```sql
+CREATE SCHEMA IF NOT EXISTS auth;
+CREATE TABLE auth.users (
+  user_id UUID PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  name TEXT,
+  password_hash TEXT,
+  avatar TEXT,
+  verified_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+```
+
+- Core schema (core.*)
+```sql
+CREATE SCHEMA IF NOT EXISTS core;
+CREATE TABLE core.conservation_areas (
+  area_id UUID PRIMARY KEY,
+  area_register INT NOT NULL,
+  area_name TEXT,
+  area_description TEXT,
+  area_note TEXT,
+  created_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+```
+
+- CMS schema (cms.*)
+```sql
+CREATE SCHEMA IF NOT EXISTS cms;
+CREATE TABLE cms.posts (
+  post_id UUID PRIMARY KEY,
+  author_id UUID REFERENCES auth.users(user_id),
+  title TEXT,
+  slug TEXT UNIQUE,
+  content TEXT,
+  excerpt TEXT,
+  published_at TIMESTAMPTZ,
+  status VARCHAR(32) CHECK (status IN ('draft','published','archived')),
+  featured_image TEXT,
+  created_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ,
+  deleted_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by UUID,
+  updated_by UUID,
+  deleted_by UUID
+);
+```
+
+These are skeletons intended to guide the actual, fully-typed DDL we’ll introduce in the migration plan. The final implementation will refine data types and constraints to align with the domain model and performance requirements.
+
+---
 ### `vogelkop_conservation_areas` _(Master Table)_
 
 | Field              | Type   | Note               |
