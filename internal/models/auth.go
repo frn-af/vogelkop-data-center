@@ -10,13 +10,23 @@ type User struct {
 	ID           uuid.UUID  `json:"id" db:"user_id"`
 	Email        string     `json:"email" db:"email"`
 	Name         *string    `json:"name" db:"name"`
-	PasswordHash string     `json:"-" db:"password_hash"`
+	PasswordHash *string    `json:"-" db:"password_hash"`
 	Avatar       *string    `json:"avatar" db:"avatar"`
 	VerifiedAt   *time.Time `json:"verified_at" db:"verified_at"`
 	CreatedAt    time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt    *time.Time `json:"updated_at" db:"updated_at"`
 	DeletedAt    *time.Time `json:"deleted_at" db:"deleted_at"`
 	IsActive     bool       `json:"is_active" db:"is_active"`
+	RoleID       *uuid.UUID `json:"role_id" db:"role_id"`
+	RoleName     *string    `json:"role_name,omitempty" db:"role_name"`
+}
+
+type Role struct {
+	ID          uuid.UUID `json:"id" db:"role_id"`
+	Name        string    `json:"name" db:"name"`
+	Description *string   `json:"description" db:"description"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+	IsActive    bool      `json:"is_active" db:"is_active"`
 }
 
 type Account struct {

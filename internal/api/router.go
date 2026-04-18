@@ -19,19 +19,14 @@ func SetupRouter(cfg *config.Config, dbPool *pgxpool.Pool) *gin.Engine {
 
 	router := gin.Default()
 
-	// Global Middleware
-	router.Use(middleware.CORS())
+	router.Use(middleware.CORS(cfg))
 
-	// Health Check
 	router.GET("/health", handlers.HealthCheck)
 
-	// Swagger documentation route
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// API Group V1
 	v1 := router.Group("/api/v1")
 	{
-		// Auth Routes
 		authService := services.NewAuthService(dbPool, cfg)
 		authHandler := handlers.NewAuthHandler(cfg, authService)
 
@@ -39,58 +34,59 @@ func SetupRouter(cfg *config.Config, dbPool *pgxpool.Pool) *gin.Engine {
 		{
 			auth.GET("/google/login", authHandler.GoogleLogin)
 			auth.GET("/google/callback", authHandler.GoogleCallback)
+			auth.POST("/logout", authHandler.Logout)
+		}
+
+		authProtected := v1.Group("/auth")
+		authProtected.Use(middleware.AuthRequired(cfg))
+		{
+			authProtected.GET("/me", authHandler.GetMe)
 		}
 
 		coreService := services.NewCoreService(dbPool)
 		coreHandler := handlers.NewCoreHandler(coreService)
 
-		protected := v1.Group("")
-		protected.Use(middleware.AuthRequired(cfg))
+		readOnly := v1.Group("")
+		readOnly.Use(middleware.AuthRequired(cfg))
+		readOnly.Use(middleware.RoleRequired("admin", "editor", "viewer"))
 		{
-			areas := protected.Group("/conservation-areas")
-			{
-				areas.GET("", coreHandler.ListConservationAreas)
-				areas.GET("/:id", coreHandler.GetConservationArea)
-				areas.POST("", coreHandler.CreateConservationArea)
-				areas.PUT("/:id", coreHandler.UpdateConservationArea)
-				areas.DELETE("/:id", coreHandler.DeleteConservationArea)
-			}
+			readOnly.GET("/conservation-areas", coreHandler.ListConservationAreas)
+			readOnly.GET("/conservation-areas/:id", coreHandler.GetConservationArea)
+			readOnly.GET("/legal-decisions", coreHandler.ListLegalDecisions)
+			readOnly.GET("/legal-decisions/:id", coreHandler.GetLegalDecision)
+			readOnly.GET("/locations", coreHandler.ListLocations)
+			readOnly.GET("/locations/:id", coreHandler.GetLocation)
+			readOnly.GET("/functions", coreHandler.ListFunctions)
+			readOnly.GET("/functions/:id", coreHandler.GetFunction)
+			readOnly.GET("/zoning-blocks", coreHandler.ListZoningBlocks)
+			readOnly.GET("/zoning-blocks/:id", coreHandler.GetZoningBlock)
+		}
 
-			decisions := protected.Group("/legal-decisions")
-			{
-				decisions.GET("", coreHandler.ListLegalDecisions)
-				decisions.GET("/:id", coreHandler.GetLegalDecision)
-				decisions.POST("", coreHandler.CreateLegalDecision)
-				decisions.PUT("/:id", coreHandler.UpdateLegalDecision)
-				decisions.DELETE("/:id", coreHandler.DeleteLegalDecision)
-			}
+		writeAccess := v1.Group("")
+		writeAccess.Use(middleware.AuthRequired(cfg))
+		writeAccess.Use(middleware.RoleRequired("admin", "editor"))
+		{
+			writeAccess.POST("/conservation-areas", coreHandler.CreateConservationArea)
+			writeAccess.PUT("/conservation-areas/:id", coreHandler.UpdateConservationArea)
+			writeAccess.POST("/legal-decisions", coreHandler.CreateLegalDecision)
+			writeAccess.PUT("/legal-decisions/:id", coreHandler.UpdateLegalDecision)
+			writeAccess.POST("/locations", coreHandler.CreateLocation)
+			writeAccess.PUT("/locations/:id", coreHandler.UpdateLocation)
+			writeAccess.POST("/functions", coreHandler.CreateFunction)
+			writeAccess.PUT("/functions/:id", coreHandler.UpdateFunction)
+			writeAccess.POST("/zoning-blocks", coreHandler.CreateZoningBlock)
+			writeAccess.PUT("/zoning-blocks/:id", coreHandler.UpdateZoningBlock)
+		}
 
-			locations := protected.Group("/locations")
-			{
-				locations.GET("", coreHandler.ListLocations)
-				locations.GET("/:id", coreHandler.GetLocation)
-				locations.POST("", coreHandler.CreateLocation)
-				locations.PUT("/:id", coreHandler.UpdateLocation)
-				locations.DELETE("/:id", coreHandler.DeleteLocation)
-			}
-
-			functions := protected.Group("/functions")
-			{
-				functions.GET("", coreHandler.ListFunctions)
-				functions.GET("/:id", coreHandler.GetFunction)
-				functions.POST("", coreHandler.CreateFunction)
-				functions.PUT("/:id", coreHandler.UpdateFunction)
-				functions.DELETE("/:id", coreHandler.DeleteFunction)
-			}
-
-			blocks := protected.Group("/zoning-blocks")
-			{
-				blocks.GET("", coreHandler.ListZoningBlocks)
-				blocks.GET("/:id", coreHandler.GetZoningBlock)
-				blocks.POST("", coreHandler.CreateZoningBlock)
-				blocks.PUT("/:id", coreHandler.UpdateZoningBlock)
-				blocks.DELETE("/:id", coreHandler.DeleteZoningBlock)
-			}
+		adminAccess := v1.Group("")
+		adminAccess.Use(middleware.AuthRequired(cfg))
+		adminAccess.Use(middleware.RoleRequired("admin"))
+		{
+			adminAccess.DELETE("/conservation-areas/:id", coreHandler.DeleteConservationArea)
+			adminAccess.DELETE("/legal-decisions/:id", coreHandler.DeleteLegalDecision)
+			adminAccess.DELETE("/locations/:id", coreHandler.DeleteLocation)
+			adminAccess.DELETE("/functions/:id", coreHandler.DeleteFunction)
+			adminAccess.DELETE("/zoning-blocks/:id", coreHandler.DeleteZoningBlock)
 		}
 	}
 

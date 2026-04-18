@@ -23,6 +23,9 @@ type Config struct {
 	GoogleClientID     string
 	GoogleClientSecret string
 	GoogleRedirectURL  string
+	FrontendURL        string
+	CookieDomain       string
+	CookieSecure       bool
 }
 
 func LoadConfig() *Config {
@@ -47,6 +50,9 @@ func LoadConfig() *Config {
 		GoogleClientID:     getEnv("GOOGLE_CLIENT_ID", ""),
 		GoogleClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
 		GoogleRedirectURL:  getEnv("GOOGLE_REDIRECT_URL", "http://localhost:8080/api/v1/auth/google/callback"),
+		FrontendURL:        getEnv("FRONTEND_URL", "http://localhost:3000"),
+		CookieDomain:       getEnv("COOKIE_DOMAIN", "localhost"),
+		CookieSecure:       getEnv("COOKIE_SECURE", "false") == "true",
 	}
 }
 
