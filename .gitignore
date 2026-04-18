@@ -11,6 +11,10 @@
 .env.local
 .env.prod
 
+# Sisyphus AI files
+/.sisyphus
+/.sisyphus/*
+
 # Test binary, build with `go test -c`
 *.test
 
